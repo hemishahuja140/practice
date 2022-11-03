@@ -1,0 +1,52 @@
+---
+title: Projectfinal
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warnings = FALSE, 
+  messages = FALSE, 
+  prompt = FALSE,
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+
+```
+
+
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+This R package is designed to provide a template for users to conduct various statistical tests, including the two sample t-test, simple linear regression test and chi-squared test for independence, on any sample data set to solve the research questions of interest.
+
+## First things first
+
+`projectfinal` is a toy project and is still under development. You can install the latest version from [GitHub](https://github.com/) with:
+
+```{r, install, results = "hide", eval = FALSE}
+# install.packages("remotes")
+remotes::install_github("hemishahuja140/mq-stat1378-project2022")
+```
+
+## Take it for a spin
+
+`projectfinal` contains three wrapper functions with the three seperate tests. For our example, we will consider `mytest_chi` which will perform a chi-squared test for independence.
+
+```{r example}
+devtools::install_github("https://github.com/hemishahuja140/practice")
+
+library("projectfinal")
+ 
+mytest_chi(project2022)
+```
+
+
