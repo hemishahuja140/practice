@@ -1,0 +1,25 @@
+Package: projectfinal
+Title: Statistical Tests
+Version: 0.0.0.9000
+Authors@R: 
+    person("Hemish", "Ahuja", , "hemish.ahuja1@students.mq.edu.au", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: completes the two sample t-test, chi-squared test and simple linear regression test on any dataset.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
+Suggests: 
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    broom,
+    dplyr,
+    ggplot2,
+    glue,
+    janitor,
+    magrittr
+Depends: 
+    R (>= 2.10)
+LazyData: true

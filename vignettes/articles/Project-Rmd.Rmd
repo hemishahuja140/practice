@@ -1,0 +1,319 @@
+---
+title: "Project"
+author: "Hemish Ahuja"
+date: "2022-10-16"
+output:
+  pdf_document: default
+params:
+  data: project2022.csv
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{=tex}
+\tableofcontents
+\pagebreak
+```
+```{r loadpackages, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(glue)
+library(kableExtra)
+library(bookdown)
+library(dbplyr)
+library(broom)
+library(patchwork)
+library(sloop)
+library(janitor)
+library(projectfinal)
+```
+
+```{r importdata, include=FALSE}
+project <- read.csv("project2022.csv")
+project
+```
+
+## Abstract
+
+This report answers 3 research questions of interest including whether there is a linear relationship between height and weight, if mean height of male and females the same and if there's is any association between gender and the amount of physical activity. To answer these questions, the following statistical tests were utilised:
+
+-   simple linear regression test
+
+-   two-sample t-test
+
+-   chi-squared test for independence
+
+These tests were conducted on a sample data set, project20222, which contains 1000 observations of men and women aged 26-45 with information on the following variables:
+
+-   ID
+
+-   Gender
+
+-   Height (in cm)
+
+-   Weight (in kg)
+
+-   Physical Activity (None, Moderate or Intense)
+
+This report found that:
+
+-   There is a linear relationship between height and weight
+
+-   The mean height of males and females aren't the same
+
+-   There is a level of association between gender and amount of physical activity
+
+\pagebreak
+
+## Introduction
+
+According to the National Library of Medicine(@weight-h2005 ) , a relationship between human height and weight exists. However, the nature of this relationship is yet to be fully discovered by scientific organisations as to whether it is a linear, quadratic, cubic, positive or negative relationship.
+
+Furthermore, researchers from the University of Helsinki (@menwomen ) have identified that differences in the X sex chromosome may be a contributing factor for the heights differences between the sexes. While females have 2 X chromosomes, males only have 1 X chromosome.
+
+Adding on, a recent survey conducted by the Northern Ireland Assembly (@genderimbalance), the Continuous Household Survey, found that 47% of women in Northern Ireland said they had participated in sport in the previous 12 months, compared with 63% of men, Similarly, 32% of men are a member of a sports club or gym which is more than double compared to women (14%).
+
+To confirm some of the research conducted by various organisations around the world, we will be conducting statistical tests on a 1000 population sample by answering the following research questions:
+
+1.  Is there a linear relationship between height and weight?
+
+2.  Is the mean height of male and female the same? (assume equal variances between male and female heights)?
+
+3.  Is there any association between gender and the amount of physical activity?
+
+\pagebreak
+
+## Methodology
+
+### Research Question 1
+
+To determine whether a linear relationship is present between height and weight, we will conduct a simple linear regression test. This test 'estimates the relationship between one independent variable and one dependent variable using a straight line.' In order to conduct the linear test, several assumptions must be considered including:
+
+1.  Relationship between the two variables are linear
+
+2.  The values from the dependent variable are normally distributed about the regression line
+
+3.  Residuals are independent and normally distributed
+
+4.  Residuals have constant variance
+
+To calculate the estimated slope, the following formula is used: $$\hat{\beta} = \frac{S_{xy}}{S_{xx}}$$
+
+After this, we will use our estimated slope and standard deviation of residuals to calculate our test-statistic that has sampling distribution: $$T = \frac{\hat{\beta}}{\frac{S_{Y\vert{X}}}{\sqrt{S_{XX}}}} \sim t_{n-2}$$, where $S_{Y\vert{X}}=\sqrt{\frac{S_{yy}-\hat{\beta}S_{xy}}{n-2}}$
+
+From our test-statistic, we can look at a t-distribution table to obtain our p.value. If the p.value is larger than the significance level of 5%, we retain the null hypothesis that suggests no linear relationship between height and weight. On the other hand, a p.value lower than 5% provides evidence to reject the null hypothesis and suggest a linear relationship is present between height and weight.
+
+### Research Question 2
+
+To determine whether male and female heights are the same, a two sample t-test will be conducted. A two sample t-test is used to 'compare 'test whether the unknown population means of two groups are equal or not.'
+
+The assumptions for this test are:
+
+1.  Two samples are independent from each other
+
+2.  Observations are independent from each other
+
+3.  Data is approximately normally distributed
+
+4.  Equal population variance between the two groups (ratio of standard deviations must be less than 2)
+
+To obtain our test-statistic value with it's t-sampling distribution, we must use a pooled variance,$s_p$ since we are assuming equal variance between the two populations: $$T = \frac{(\overline{X_1}-\overline{X_2})-(\mu_1-\mu_2          )}{s_{p}\sqrt{\frac{1}{n_1}+\frac{1}{n_2}}} \sim t_{n_1+n_2-2}$$ , where $s_p = \sqrt{\frac{s_{x_1}^2(n_1-1)+s_{x_2}^2(n_2-2)}{n_1+n _2-2}}$
+
+Similar to the linear test, we will use our test-statistic to get our p.value which can be compared against the significance level of 5% to obtain our final decision on whether the height of males and females is the same.
+
+### Research Question 3
+
+To determine whether a relationship between gender and amount of physical activity is present, a chi-squared test for independence will be conducted. This test is used to test whether two categorical variables are related to each other.
+
+The assumptions for this test are:
+
+1.  The two variables are categorical
+
+2.  Observations are independent from each other
+
+3.  All expected frequencies must be larger than 5
+
+The first step in order to complete this test is to calculate the expected frequencies that is done in: $$E_{ij}=\frac{(row_i \hspace{0.5em} total)(column_j\hspace{0.5em} total)}{table\hspace{0.5em} total}$$ We can then use these expected frequencies along with our observed frequencies to calculate our test statistic: $$X^2 = \sum_{i=1}^g \frac{(O_i-E_i)^2}{E_i} \sim t_g-1$$ , where g is the degrees of freedom that is worked out by multiplying the (number of columns - 1) and the (number of rows - 1)
+
+After obtaining our chi-squared test-statistic, we look at the chi-squared distribution table to get our p.value. The same process is then followed to work out the decision and conclusion for our test.
+
+\pagebreak
+
+## Results
+
+### Research Question 1
+
+To check if the assumptions, as stated in the methodology, are true, we will need to produce a graphical summary:
+
+```{r assumptions_linear, echo=FALSE}
+ y_vs_x <- ggplot(project, aes(weight,height)) +
+    geom_point() + 
+    geom_smooth(method = lm, se = TRUE) + #line of best fit
+    ggtitle ("Weight vs Height") #title of graph
+  
+  model <- lm(project$weight ~ project$height) #defining linear regression model 
+  
+  #scatter plot of residual distance against fitted values
+  scatter_plot <- ggplot(data = model, mapping = aes(fitted(model), resid(model))) + 
+    geom_point() +
+    ggtitle("Scatter Plot of Residual Distance against Fitted Values") + #title of graph
+    geom_hline(yintercept = 0, color = "red") + #horizontal line through y = 0
+    xlab("fitted values") + #label of x-axis
+    ylab("residual distance") #label of y-axis
+  
+  #histogram showing frequency of residual distance
+  histogram <- ggplot(data = model) +
+    geom_histogram(mapping = aes(resid(model)), binwidth = 7, col = "white", fill = "black") +
+    ggtitle("Histogram of Residual Distance") + #title of graph
+    xlab("residual distance") #label of x-axis
+  
+  gg_combine <- y_vs_x / scatter_plot / histogram #layout of graphs on same page
+  gg_combine  
+```
+
+-   The graph of weight vs height is increasing so the relationship between x and y is linear
+
+-   Residuals have constant variance as shown by the approximate equal distribution of residual distance around y = 0
+
+-   Residuals are approximately normally distributed which can be clearly seen in the histogram
+
+As all our assumptions are satisfied, we are able to carry out the linear test.
+
+```{r keystats_linear, echo=FALSE, include=FALSE}
+regression <- lm(weight ~ height, data = project)
+tibble <- tidy(regression) %>%
+  slice(-1)
+slope <- tibble$estimate
+df_linear <- nrow(project) - 2
+p.value_linear <- tibble$p.value
+stat_linear <- tibble$statistic
+decision_linear <- ifelse(p.value_linear > 0.05,
+                   glue("Since the p.value of {p.value_linear} is greater than 0.05, there is sufficient evidence to retain the null hypothesis. "),
+                   glue("Since the p.value of {p.value_linear} is less than 0.05, there is sufficient evidence to reject the null hypothesis and support the alternate hypothesis. "))
+conclusion_linear <- ifelse(p.value_linear > 0.05,
+                     glue(" As we have retained the null hypothesis, there is evidence to suggest that there is no linear relationship between height and weight."),
+                     glue("As we have rejected the null hypothesis, there evidence to suggest that there is a linear relationship between height and weight."))
+```
+
+The estimated slope is: $$\hat{\beta} = `r slope`$$
+
+The test statistic is caluclated to be: $$T = `r {stat_linear}` \sim t_{`r df_linear`}$$ From this statistic, we are able to obtain the following p-value: $$p-value = `r p.value_linear` $$ `r decision_linear`
+
+`r conclusion_linear`
+
+### Research Question 2
+
+```{r keystats_t, echo=FALSE, include=FALSE}
+fem_height <- project %>%
+  filter(gender == "Female") %>%
+  select(height) %>%
+  unlist() %>%
+  as.numeric()
+fem_height
+male_height <- project %>%
+  filter(gender == "Male") %>%
+  select(height) %>%
+  unlist() %>%
+  as.numeric()
+male_height
+mean_fem <- mean(fem_height)
+mean_male <- mean(male_height)
+sd_fem <- sd(fem_height)
+sd_male <- sd(male_height)
+n_fem <- length(fem_height)
+n_male <- length(male_height)
+sp <- sqrt(((n_fem-1)*(sd_fem)^2+(n_male-2)*(sd_male)^2)/(n_fem+n_male-2))
+stat_t <- (mean_male - mean_fem)/(sp*sqrt((1/n_male)+(1/n_fem)))
+df_t <- n_fem + n_male - 2
+assum <- max(sd_fem,sd_male)/min(sd_fem,sd_male)
+p.value_t <- t.test(male_height,fem_height,var.equal = TRUE)$p.value
+decision_t <- ifelse(p.value_t > 0.05,
+                   glue("Since the p.value of {p.value_t} is greater than 0.05, there is sufficient evidence to retain the null hypothesis. "),
+                   glue("Since the p.value of {p.value_t} is less than 0.05, there is sufficient evidence to reject the null hypothesis and support the alternate hypothesis. "))
+conclusion_t <- ifelse(p.value_t > 0.05,
+                     glue(" As we have retained the null hypothesis, there is evidence to suggest that the mean height of males and females is the same."),
+                     glue("As we have rejected the null hypothesis, there is evidence to suggest that the mean height of males and females is different."))
+```
+
+In order to see if we can assume equal variance, we must check if it satisfies the asumption of having a ratio of standard deviations less than 2. $$\frac{s_1}{s_2} = `r assum`$$ As this is less than 2, we can conduct our two-sample t-test by assuming equal variances.
+
+The pooled standard deviation is: $$s_p = `r sp `$$ We use this along with our sample means to deduce the test-statistic: $$T = `r stat_t`$$ By checking our test statistic on our t-distribution table, the following p.value was obtained: $$p-value = `r p.value_t`$$ `r decision_t`
+
+`r conclusion_t`
+
+### Research Question 3
+
+To complete this test, the project data set must be transformed to a frequency table with the observed frequencies as well as the expected frequencies:
+
+#### Observed
+
+```{r observed, echo=FALSE}
+chi <- chisq.test(tabyl(gender,phys,dat = project))
+observed <- chi$observed %>%
+  kable()
+observed
+
+
+```
+
+#### Expected
+
+```{r expected, echo=FALSE}
+expected <- chi$expected %>%
+  kable()
+expected
+```
+
+As all the expected frequencies are greater than 5, it satisfies the assumption and we can go ahead with calculating our results.
+
+```{r keystats_chi, echo=FALSE}
+stat_chi <- chi$statistic
+p.value_chi <- chi$p.value
+decision_chi <- ifelse(p.value_chi > 0.05,
+                   glue("Since the p.value of {p.value_chi} is greater than 0.05, there is sufficient evidence to retain the null hypothesis. "),
+                   glue("Since the p.value of {p.value_chi} is less than 0.05, there is sufficient evidence to reject the null hypothesis and support the alternate hypothesis. "))
+conclusion_chi <- ifelse(p.value_chi > 0.05,
+                     glue(" As we have retained the null hypothesis, there is evidence to suggest that there is no assosciation between gender and the amount of physical activity."),
+                     glue("As we have rejected the null hypothesis, there is evidence to suggest that there is some assosciation between gender and amount of physical activity."))
+```
+
+The calculated chi-squared test-statistic is: $$X^2 = `r stat_chi`$$ The p-value is: $$p-value = `r p.value_chi`$$ `r decision_chi`
+
+`r conclusion_chi`
+
+\pagebreak
+
+## Conclusion and Further Discussion
+
+### Conclusion
+
+From the statistical tests conducted throughout our report, we have been able to confirm the research from global organisations with the following answers:
+
+1.  A linear relationship between height and weight is present for humans.
+
+2.  Mean height of males and mean height of females are not the same.
+
+3.  An association between gender and amount of physical activity exists.
+
+### Further Discussion
+
+However, the method used to obtain our answer does not come without the following limitations:
+
+-   If researchers had collected the data using faulty methods or a level of bias, then the results of the statistical tests will be misleading
+
+-   The various assumptions for all the tests may not be actually true for the data collection process which decreases reliability
+
+-   All these tests are an approximation
+
+-   Given only a sample of 1000 observations was used, it seems a bit unrealistic to conclude results for the entire population
+
+-   Limited information provided about the strength of the linear relationship and level of association between the two variables
+
+This report recommends that these sames tests are conducted on a broader sample with individuals of a different age, personal traits, physical attributes.etc. because this will provide a more reliable result for these research questions.
+
+\pagebreak
+
+## References
